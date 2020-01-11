@@ -1,0 +1,122 @@
+#!/bin/bash
+# usage: redcap <command> [arguments…]
+#        redcap fields                  Fetch field descriptions and metadata
+#        redcap records                 Fetch all records
+#        redcap record <id> [id […]]    Fetch the given record(s)
+#        redcap help                    Show this help
+#
+# Quick, ad-hoc interaction with REDCap's web API for easier development and
+# exploration.
+#
+# If stdout is to a terminal and the `vd` (https://visidata.org) command is
+# available, output will automatically be displayed in it.
+#
+# The API endpoint and authentication token must be provided via the
+# environment variables REDCAP_API_URL and REDCAP_API_TOKEN.
+#
+# Besides any normal arguments they take, all commands also accept raw REDCap
+# API parameters as "key=value" arguments.  For example, normally running:
+#
+#     redcap record 42
+#
+# would return data from all instruments/forms for record #42.  You can limit
+# to specific instruments of interest using:
+#
+#     redcap record 42 forms=some_instrument_name
+#
+set -euo pipefail
+
+self="$(basename "$0")"
+
+main() {
+    local cmd="${1:-help}"
+
+    case "$cmd" in
+        fields|records|record)
+            shift;;
+
+        help|--help|-h)
+            usage
+            exit 0;;
+
+        *)
+            echo "$self $cmd: unrecognized command" >&2
+            usage
+            exit 1;;
+    esac
+
+    : "${REDCAP_API_URL:?The environment variable REDCAP_API_URL is required.}"
+    : "${REDCAP_API_TOKEN:?The environment variable REDCAP_API_TOKEN is required.}"
+
+    $cmd "$@" | view
+}
+
+usage() {
+    local line
+    while read -r line; do
+        if [[ $line =~ ^#! ]]; then
+            continue
+        elif [[ $line =~ ^# ]]; then
+            line="${line/##/}"
+            line="${line/# /}"
+            echo "$line"
+        else
+            break
+        fi
+    done < "$0"
+}
+
+view() {
+    if [[ -t 1 ]] && hash vd 2>/dev/null; then
+        exec vd -f json
+    else
+        exec cat
+    fi
+}
+
+fields() {
+    api content=metadata
+}
+
+records() {
+    records_ "$@"
+}
+
+record() {
+    local -a ids params
+
+    for arg in "$@"; do
+        case "$arg" in
+            *=*)
+                params+=("$arg");;
+            *)
+                ids+=("$arg");;
+        esac
+    done
+
+    if [[ ${#ids[@]} -eq 0 ]]; then
+        echo "At least one record id is required." >&2
+        exit 1
+    fi
+
+    records_ records="$(join , "${ids[@]}")" "${params[@]}"
+}
+
+records_() {
+    api content=record type=flat rawOrLabel=label exportCheckboxLabel=true "$@"
+}
+
+api() {
+    curl -fsSL "$REDCAP_API_URL" \
+        -d token="$REDCAP_API_TOKEN" \
+        -d format=json \
+        -d "$(join '&' "$@")"
+}
+
+join() {
+    IFS="$1"
+    shift
+    echo "$*"
+}
+
+main "$@"
