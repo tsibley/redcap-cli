@@ -1,0 +1,25 @@
+usage: redcap <command> [arguments…]
+       redcap fields                  Fetch field descriptions and metadata
+       redcap records                 Fetch all records
+       redcap record <id> [id […]]    Fetch the given record(s)
+       redcap help                    Show this help
+
+Quick, ad-hoc interaction with REDCap's web API for easier development and
+exploration.
+
+If stdout is to a terminal and the `vd` (https://visidata.org) command is
+available, output will automatically be displayed in it.
+
+The API endpoint and authentication token must be provided via the
+environment variables REDCAP_API_URL and REDCAP_API_TOKEN.
+
+Besides any normal arguments they take, all commands also accept raw REDCap
+API parameters as "key=value" arguments.  For example, normally running:
+
+    redcap record 42
+
+would return data from all instruments/forms for record #42.  You can limit
+to specific instruments of interest using:
+
+    redcap record 42 forms=some_instrument_name
+
