@@ -1,7 +1,9 @@
 usage: redcap <command> [arguments…]
+       redcap project                 Fetch project metadata
        redcap fields                  Fetch field descriptions and metadata
        redcap records                 Fetch all records
        redcap record <id> [id […]]    Fetch the given record(s)
+       redcap api <key>=<value> […]   Make a raw API request
        redcap help                    Show this help
 
 Quick, ad-hoc interaction with REDCap's web API for easier development and
