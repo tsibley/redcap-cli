@@ -32,8 +32,30 @@ main() {
     local cmd="${1:-help}"
 
     case "$cmd" in
-        fields|records|record)
+        fields|records)
             shift;;
+
+        record)
+            shift
+            local -a ids=() params=()
+
+            for arg in "$@"; do
+                case "$arg" in
+                    *=*)
+                        params+=("$arg");;
+                    *)
+                        ids+=("$arg");;
+                esac
+            done
+
+            if [[ ${#ids[@]} -eq 0 ]]; then
+                echo "At least one record id is required." >&2
+                exit 1
+            fi
+
+            set -- records="$(join , "${ids[@]}")" "${params[@]}"
+            cmd=records
+            ;;
 
         help|--help|-h)
             usage
@@ -79,30 +101,6 @@ fields() {
 }
 
 records() {
-    records_ "$@"
-}
-
-record() {
-    local -a ids params
-
-    for arg in "$@"; do
-        case "$arg" in
-            *=*)
-                params+=("$arg");;
-            *)
-                ids+=("$arg");;
-        esac
-    done
-
-    if [[ ${#ids[@]} -eq 0 ]]; then
-        echo "At least one record id is required." >&2
-        exit 1
-    fi
-
-    records_ records="$(join , "${ids[@]}")" "${params[@]}"
-}
-
-records_() {
     api content=record type=flat rawOrLabel=label exportCheckboxLabel=true "$@"
 }
 
