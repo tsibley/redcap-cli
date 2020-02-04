@@ -32,7 +32,7 @@ main() {
     local cmd="${1:-help}"
 
     case "$cmd" in
-        fields|records)
+        project|fields|records)
             shift;;
 
         record)
@@ -94,6 +94,10 @@ view() {
     else
         exec cat
     fi
+}
+
+project() {
+    api content=project
 }
 
 fields() {
