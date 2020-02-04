@@ -32,7 +32,7 @@ main() {
     local cmd="${1:-help}"
 
     case "$cmd" in
-        project|fields|records)
+        project|fields|records|api)
             shift;;
 
         record)
