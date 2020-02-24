@@ -4,6 +4,7 @@
 #        redcap fields                  Fetch field descriptions and metadata
 #        redcap records                 Fetch all records
 #        redcap record <id> [id […]]    Fetch the given record(s)
+#        redcap export-fields           Fetch all field names used in exports
 #        redcap api <key>=<value> […]   Make a raw API request
 #        redcap help                    Show this help
 #
@@ -34,7 +35,7 @@ main() {
     local cmd="${1:-help}"
 
     case "$cmd" in
-        project|fields|records|api)
+        project|fields|records|export-fields|api)
             shift;;
 
         record)
@@ -108,6 +109,10 @@ fields() {
 
 records() {
     api content=record type=flat rawOrLabel=label exportCheckboxLabel=true "$@"
+}
+
+export-fields() {
+    api content=exportFieldNames
 }
 
 api() {
