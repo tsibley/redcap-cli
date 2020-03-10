@@ -108,7 +108,7 @@ fields() {
 }
 
 records() {
-    api content=record type=flat rawOrLabel=label exportCheckboxLabel=true "$@"
+    api content=record type=flat rawOrLabel=label exportCheckboxLabel=true exportSurveyFields=true "$@"
 }
 
 export-fields() {
