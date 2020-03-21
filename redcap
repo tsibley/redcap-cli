@@ -117,9 +117,10 @@ export-fields() {
 
 api() {
     curl -fsSL "$REDCAP_API_URL" \
-        -d token="$REDCAP_API_TOKEN" \
+        -d @- \
         -d format=json \
-        -d "$(join '&' "$@")"
+        -d "$(join '&' "$@")" \
+        <<<"token=$REDCAP_API_TOKEN"
 }
 
 join() {
