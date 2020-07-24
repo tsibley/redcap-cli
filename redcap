@@ -92,7 +92,7 @@ usage() {
 }
 
 view() {
-    if [[ -t 1 ]] && hash vd 2>/dev/null; then
+    if [[ -t 1 ]] && type vd &>/dev/null; then
         exec vd -f json
     else
         exec cat
