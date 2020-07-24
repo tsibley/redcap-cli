@@ -2,6 +2,7 @@
 # usage: redcap <command> [arguments…]
 #        redcap project                 Fetch project metadata
 #        redcap fields                  Fetch field descriptions and metadata
+#        redcap instruments             Fetch instrument names and descriptions
 #        redcap records                 Fetch all records
 #        redcap record <id> [id […]]    Fetch the given record(s)
 #        redcap export-fields           Fetch all field names used in exports
@@ -35,7 +36,7 @@ main() {
     local cmd="${1:-help}"
 
     case "$cmd" in
-        project|fields|records|export-fields|api)
+        project|fields|instruments|records|export-fields|api)
             shift;;
 
         record)
@@ -105,6 +106,10 @@ project() {
 
 fields() {
     api content=metadata
+}
+
+instruments() {
+    api content=instrument
 }
 
 records() {
