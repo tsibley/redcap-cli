@@ -5,6 +5,10 @@
 #        redcap instruments             Fetch instrument names and descriptions
 #        redcap records                 Fetch all records
 #        redcap record <id> [id […]]    Fetch the given record(s)
+#        redcap arms                    Fetch arm names and metadata
+#        redcap events                  Fetch events names and metadata
+#        redcap event-instruments       Fetch mapping of instruments to events
+#        redcap repeats                 Fetch repeating instrument and event info
 #        redcap export-fields           Fetch all field names used in exports
 #        redcap api <key>=<value> […]   Make a raw API request
 #        redcap help                    Show this help
@@ -36,7 +40,7 @@ main() {
     local cmd="${1:-help}"
 
     case "$cmd" in
-        project|fields|instruments|records|export-fields|api)
+        project|fields|instruments|records|arms|events|event-instruments|repeats|export-fields|api)
             shift;;
 
         record)
@@ -114,6 +118,22 @@ instruments() {
 
 records() {
     api content=record type=flat rawOrLabel=label exportCheckboxLabel=true exportSurveyFields=true "$@"
+}
+
+arms() {
+    api content=arm
+}
+
+events() {
+    api content=event
+}
+
+event-instruments() {
+    api content=formEventMapping
+}
+
+repeats() {
+    api content=repeatingFormsEvents
 }
 
 export-fields() {
